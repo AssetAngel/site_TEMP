@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>fraudmoney.xyz</title>
+<meta name="description" content="AssetAngel - Pentester & Malware Developer" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --bg:#0f0f0f;
+    --muted:rgba(255,255,255,0.5);
+    --white:#fff;
+    --black:#000;
+    --primary: #d8b4fe;
+    --primary-dark: #b794f4;
+    --accent: #f0abfc;
+    --gradient: linear-gradient(135deg, #d8b4fe 0%, #f0abfc 100%);
+    --card-bg: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.08);
+    font-family:"JetBrains Mono", "Inter", monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--white);
+    display:block;
+    align-items:center;
+    justify-content:center;
+    background:#000;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+    padding: 16px;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #0f0f0f 100%);
+  }
+
+  /* Background animation */
+  .bg{
+    position:fixed;inset:0;z-index:-2;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(216, 180, 254, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(240, 171, 252, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(180, 180, 254, 0.05) 0%, transparent 50%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+  }
+
+  .wrap{
+    width:100%;
+    max-width:800px;
+    margin:0 auto;
+  }
+  .card{
+    background:var(--card-bg);
+    border-radius:16px;
+    padding:clamp(24px, 4vw, 32px);
+    border:1px solid var(--card-border);
+    backdrop-filter:blur(16px);
+    box-shadow:0 20px 60px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Elegant shimmer effect */
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gradient);
+    animation: shimmer 3s infinite;
+    z-index: 1;
+  }
+  
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  /* profile */
+  .profile{
+    text-align:center;
+    margin-bottom:32px;
+    position:relative;
+  }
+  .avatar {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .avatar img{
+    width:clamp(100px, 20vw, 120px);
+    height:clamp(100px, 20vw, 120px);
+    border-radius:999px;
+    border:2px solid rgba(255,255,255,0.1);
+    box-shadow:0 8px 32px rgba(0,0,0,0.8);
+    object-fit:cover;
+    transition: all 0.4s ease;
+    filter: grayscale(20%) contrast(110%) brightness(1.1);
+  }
+  .avatar::after {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    background: var(--gradient);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .avatar:hover::after {
+    opacity: 0.2;
+  }
+  .avatar:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(216, 180, 254, 0.3);
+  }
+  
+  h1 {
+    margin:16px 0 0;
+    font-size:clamp(24px, 6vw, 32px);
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+  }
+  
+  .role{
+    color:var(--muted);
+    font-size:clamp(14px, 3vw, 16px);
+    margin-top:8px;
+    text-align: center;
+    font-weight: 400;
+    font-family: "Inter", sans-serif;
+  }
+
+  .tagline{
+    color:var(--accent);
+    font-size:clamp(12px, 3vw, 14px);
+    margin-top:4px;
+    text-align: center;
+    font-weight: 500;
+    font-family: "JetBrains Mono", monospace;
+    opacity: 0.9;
+  }
+
+  .stats{
+    display:flex;
+    gap:clamp(20px, 5vw, 32px);
+    justify-content:center;
+    margin-top:24px;
+    color:var(--muted);
+    font-size:clamp(12px, 3vw, 14px);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .stats div {
+    transition: transform 0.3s ease;
+    text-align: center;
+  }
+  .stats div:hover {
+    transform: translateY(-2px);
+  }
+  .stats strong {
+    display: block;
+    font-size:clamp(16px, 4vw, 18px);
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 2px;
+  }
+
+  /* Status indicator */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 6px 12px;
+    background: rgba(240, 171, 252, 0.1);
+    border: 1px solid rgba(240, 171, 252, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+  
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  /* link buttons */
+  .links{
+    display:grid;
+    gap:12px;
+    margin:28px 0;
+  }
+  .link{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:16px 20px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.08);
+    text-decoration:none;
+    color:var(--white);
+    transition:all .3s ease;
+    position: relative;
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
+  }
+  .link::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient);
+    opacity: 0.08;
+    transition: left 0.4s ease;
+    z-index: 0;
+  }
+  .link:hover::before {
+    left: 0;
+  }
+  .link:hover{
+    transform:translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+  .link i{
+    font-size:20px;
+    opacity:0.9;
+    width:24px;
+    text-align:center;
+    position: relative;
+    z-index: 1;
+  }
+  .meta{
+    flex:1;
+    position: relative;
+    z-index: 1;
+    text-align: left;
+  }
+  .title{
+    font-weight:600;
+    font-size:15px;
+  }
+  .sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+
+  /* Skills section */
+  .skills{
+    margin:32px 0;
+  }
+  
+  .skill-item{
+    margin-bottom:16px;
+  }
+  
+  .skill-header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-family: "JetBrains Mono", monospace;
+  }
+  
+  .skill-bar{
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  
+  .skill-progress{
+    height: 100%;
+    background: var(--gradient);
+    border-radius: 2px;
+    transition: width 1.5s ease;
+  }
+
+  /* Projects */
+  .projects{
+    margin-top:12px;
+    display:grid;
+    gap:16px;
+  }
+  .project{
+    display:flex;
+    flex-direction: column;
+    gap: 12px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;
+    padding:20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .project::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gradient);
+    transform: scaleY(0);
+    transition: transform 0.4s ease;
+  }
+  .project:hover::before {
+    transform: scaleY(1);
+  }
+  .project:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+  .project-left{
+    flex: 1;
+  }
+  .project-title{
+    font-weight:600;
+    font-size:16px;
+    margin-bottom: 6px;
+    color: var(--white);
+  }
+  .project-sub{
+    font-size:13px;
+    color:var(--muted);
+    line-height: 1.4;
+  }
+  .project-tags{
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .tag{
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  footer{
+    text-align:center;
+    color:rgba(255,255,255,0.4);
+    font-size:12px;
+    margin-top:32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  /* Section headers */
+  section h2 {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+    color: var(--white);
+    font-family: "JetBrains Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  section h2::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: var(--gradient);
+    border-radius: 2px;
+  }
+
+  @media (min-width: 768px){
+    .links{
+      grid-template-columns:1fr 1fr;
+    }
+    .projects{
+      grid-template-columns:1fr;
+    }
+  }
+
+  /* Mobile specific styles */
+  @media (max-width: 767px){
+    body{
+      padding: 12px;
+      align-items: flex-start;
+    }
+    .card{
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .stats{
+      gap: 20px;
+    }
+    .link{
+      padding: 14px 16px;
+    }
+  }
+
+  /* Terminal style code block */
+  .terminal {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 20px 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  
+  .terminal .line {
+    margin-bottom: 8px;
+  }
+  
+  .terminal .prompt {
+    color: var(--accent);
+  }
+  
+  .terminal .command {
+    color: var(--white);
+  }
+  
+  .terminal .output {
+    color: var(--muted);
+  }
+
+  /* Elegant fade-in animation */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.8s ease forwards;
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Stagger animations */
+  .profile { animation-delay: 0.1s; }
+  .terminal { animation-delay: 0.3s; }
+  .skills { animation-delay: 0.5s; }
+  .links { animation-delay: 0.7s; }
+  .projects { animation-delay: 0.9s; }
+</style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <div class="card" role="main">
+      <section class="profile fade-in">
+        <div class="avatar">
+          <img src="assets/pfp.png" alt="AssetAngel profile picture" />
+        </div>
+        <h1>AssetAngel</h1>
+        <div class="role">Pentester & Malware Developer</div>
+        <div class="tagline">> Making cybersecurity cuter, one payload at a time</div>
+        
+        <div class="status">
+          <div class="status-dot"></div>
+          <span>Available for freelance work</span>
+        </div>
+
+        <div class="stats">
+          <div>
+            <strong>3Y+</strong>
+            <div>Security Exp</div>
+          </div>
+          <div>
+            <strong>PENTEST</strong>
+            <div>Specialization</div>
+          </div>
+          <div>
+            <strong>RE</strong>
+            <div>Reverse Engineering</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="terminal fade-in">
+        <div class="line">
+          <span class="prompt">assetangel@fraudmoney:~$</span>
+          <span class="command"> whoami</span>
+        </div>
+        <div class="line output">
+          AssetAngel - Pentester & Malware Developer
+        </div>
+        <div class="line">
+          <span class="prompt">assetangel@fraudmoney:~$</span>
+          <span class="command"> cat skills.txt</span>
+        </div>
+        <div class="line output">
+          Pentesting • Reverse Engineering • C2 Development • Malware Analysis
+        </div>
+      </div>
+
+      <section class="skills fade-in" aria-label="Skills">
+        <h2>Technical Skills</h2>
+        <div class="skills">
+          <div class="skill-item">
+            <div class="skill-header">
+              <span>Pentesting & Red Teaming</span>
+              <span>90%</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-progress" style="width: 90%"></div>
+            </div>
+          </div>
+          
+          <div class="skill-item">
+            <div class="skill-header">
+              <span>Reverse Engineering</span>
+              <span>85%</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-progress" style="width: 85%"></div>
+            </div>
+          </div>
+          
+          <div class="skill-item">
+            <div class="skill-header">
+              <span>Malware Development</span>
+              <span>80%</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-progress" style="width: 80%"></div>
+            </div>
+          </div>
+          
+          <div class="skill-item">
+            <div class="skill-header">
+              <span>C2 Framework Development</span>
+              <span>75%</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-progress" style="width: 75%"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="fade-in" aria-label="Connect">
+        <h2>Connect</h2>
+        <div class="links">
+          <a class="link" href="https://github.com/assetangel" target="_blank" rel="noopener">
+            <i class="fa-brands fa-github"></i>
+            <div class="meta">
+              <div class="title">GitHub</div>
+              <div class="sub">@assetangel</div>
+            </div>
+          </a>
+
+          <a class="link" href="https://discord.com/users/assetangel" target="_blank" rel="noopener">
+            <i class="fa-brands fa-discord"></i>
+            <div class="meta">
+              <div class="title">Discord</div>
+              <div class="sub">@assetangel</div>
+            </div>
+          </a>
+
+          <a class="link" href="mailto:AssetAngel@proton.me">
+            <i class="fa-solid fa-envelope"></i>
+            <div class="meta">
+              <div class="title">Email</div>
+              <div class="sub">AssetAngel@proton.me</div>
+            </div>
+          </a>
+
+          <a class="link" href="#" onclick="alert('PGP Key available upon request')">
+            <i class="fa-solid fa-key"></i>
+            <div class="meta">
+              <div class="title">PGP</div>
+              <div class="sub">Encrypted Communication</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="projects fade-in" aria-label="Projects">
+        <h2>Current Projects</h2>
+        <div class="projects">
+          <div class="project">
+            <div class="project-left">
+              <div class="project-title">Custom C2 Framework</div>
+              <div class="project-sub">Modular command and control framework with evasive capabilities and multiple transport protocols.</div>
+              <div class="project-tags">
+                <span class="tag">C++</span>
+                <span class="tag">WinAPI</span>
+                <span class="tag">Networking</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="project">
+            <div class="project-left">
+              <div class="project-title">Malware Evasion Research</div>
+              <div class="project-sub">Developing novel techniques for bypassing modern EDR/AV solutions through API unhooking and direct syscalls.</div>
+              <div class="project-tags">
+                <span class="tag">Assembly</span>
+                <span class="tag">Windows Internals</span>
+                <span class="tag">Research</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="project">
+            <div class="project-left">
+              <div class="project-title">Kernel Exploitation</div>
+              <div class="project-sub">Studying Windows kernel vulnerabilities and developing reliable exploits for privilege escalation.</div>
+              <div class="project-tags">
+                <span class="tag">C</span>
+                <span class="tag">Kernel</span>
+                <span class="tag">Exploit Dev</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="fade-in">
+        © <span id="year"></span> fraudmoney.xyz — AssetAngel | Pentester & Malware Developer
+        <div style="margin-top: 8px; font-size: 10px; opacity: 0.6;">
+          > This site uses no tracking. OpSec matters.
+        </div>
+      </footer>
+    </div>
+  </main>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Add fade-in animations to all elements
+  document.addEventListener('DOMContentLoaded', function() {
+    const elements = document.querySelectorAll('.fade-in');
+    elements.forEach(el => {
+      el.style.animationDelay = el.style.animationDelay || '0.1s';
+    });
+    
+    // Animate skill bars
+    setTimeout(() => {
+      const skills = document.querySelectorAll('.skill-progress');
+      skills.forEach(skill => {
+        const width = skill.style.width;
+        skill.style.width = '0%';
+        setTimeout(() => {
+          skill.style.width = width;
+        }, 500);
+      });
+    }, 1000);
+  });
+</script>
+</body>
+</html>
